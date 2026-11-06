@@ -16,6 +16,12 @@ def main():
     bench_parser.add_argument("--agent", choices=["baseline", "optimized", "both"], default="both", help="Which agent to benchmark")
     bench_parser.add_argument("--chaos", action="store_true", help="Enable Chaos Engineering fault injection on tools")
 
+    # generate synthetic tasks command
+    synth_parser = subparsers.add_parser("synth", help="Generate synthetic benchmark tasks")
+    synth_parser.add_argument("--domain", choices=["ecommerce", "devops", "finance"], default="ecommerce")
+    synth_parser.add_argument("--count", type=int, default=5, help="Number of tasks to generate")
+    synth_parser.add_argument("--out", default=None, help="Optional output JSON filepath")
+
     # ui command
     ui_parser = subparsers.add_parser("ui", help="Launch interactive comparison web dashboard")
     ui_parser.add_argument("--port", type=int, default=8080, help="Port to serve dashboard on")
@@ -80,6 +86,17 @@ def main():
             print(f"  • Avg Tokens   : {s['avg_tokens']}")
             print(f"  • Avg Steps    : {s['avg_steps']}")
             print(f"  • Total Cost   : ${s['total_cost']}")
+
+    elif args.command == "synth":
+        from agentarena.synthetic.generator import SyntheticTaskGenerator
+        from agentarena.tasks.loader import DatasetLoader
+        tasks = SyntheticTaskGenerator.generate_suite(domain=args.domain, count=args.count)
+        if args.out:
+            DatasetLoader.save_to_json(tasks, args.out)
+            print(f"✅ Generati con successo {len(tasks)} compiti sintetici in {args.out}")
+        else:
+            import json
+            print(json.dumps([t.__dict__ for t in tasks], indent=2, ensure_ascii=False))
 
     elif args.command == "diff":
         from agentarena.evaluators.reporter import ReportExporter

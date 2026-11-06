@@ -5,6 +5,7 @@ from agentarena.core.models import TaskTrajectory, AgentStepRecord, ToolCallReco
 from agentarena.evaluators.evaluator import TrajectoryEvaluator
 from agentarena.judge.llm_judge import LLMasAJudgeEvaluator
 from agentarena.resilience.evaluator import ResilienceEvaluator
+from agentarena.security.evaluator import PromptInjectionDefenseEvaluator
 from agentarena.core.storage import RunStorage
 
 class BaseAgent:
@@ -38,6 +39,10 @@ class AgentHarness:
             # 3. Resilience & Self-Healing Evaluation
             resilience_metrics = ResilienceEvaluator.evaluate_resilience(traj)
             metrics.update(resilience_metrics)
+
+            # 4. Security & Prompt Injection Defense Evaluation
+            sec_metrics = PromptInjectionDefenseEvaluator.evaluate_security(traj)
+            metrics.update(sec_metrics)
 
             traj.metrics = metrics
             

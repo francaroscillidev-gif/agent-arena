@@ -1,0 +1,53 @@
+[
+  {
+    "id": "synth_devops_1_710191",
+    "name": "Synthesized DevOps Outage #1",
+    "description": "Diagnose latency spike on event-worker microservice.",
+    "category": "Cluster Health",
+    "difficulty": "hard",
+    "prompt": "Il servizio event-worker ha una latenza anomala p99 > 3s. Analizza i log e applica fix.",
+    "expected_output": "Fix applied",
+    "expected_tools": [
+      "check_logs",
+      "restart_pod",
+      "explain_query",
+      "schema_inspector"
+    ],
+    "max_steps": 5,
+    "validation_criteria": {}
+  },
+  {
+    "id": "synth_devops_2_a1ee7a",
+    "name": "Synthesized DevOps Outage #2",
+    "description": "Diagnose latency spike on event-worker microservice.",
+    "category": "Database Tuning",
+    "difficulty": "hard",
+    "prompt": "Il servizio event-worker ha una latenza anomala p99 > 3s. Analizza i log e applica fix.",
+    "expected_output": "Fix applied",
+    "expected_tools": [
+      "check_logs",
+      "restart_pod",
+      "explain_query",
+      "schema_inspector"
+    ],
+    "max_steps": 5,
+    "validation_criteria": {}
+  },
+  {
+    "id": "synth_devops_3_9ced67",
+    "name": "Synthesized DevOps Outage #3",
+    "description": "Diagnose latency spike on auth-service microservice.",
+    "category": "Incident Response",
+    "difficulty": "hard",
+    "prompt": "Il servizio auth-service ha una latenza anomala p99 > 3s. Analizza i log e applica fix.",
+    "expected_output": "Fix applied",
+    "expected_tools": [
+      "check_logs",
+      "restart_pod",
+      "explain_query",
+      "schema_inspector"
+    ],
+    "max_steps": 5,
+    "validation_criteria": {}
+  }
+]
