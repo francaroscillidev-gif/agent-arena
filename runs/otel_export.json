@@ -1,0 +1,563 @@
+[
+  {
+    "resource_spans": [
+      {
+        "resource": {
+          "attributes": {
+            "service.name": "agentarena",
+            "agent.name": "CustomerOpsAgent",
+            "agent.version": "v2.0.0-optimized"
+          }
+        },
+        "scope_spans": [
+          {
+            "scope": {
+              "name": "agentarena.tracer",
+              "version": "1.0.0"
+            },
+            "spans": [
+              {
+                "trace_id": "8a538c8f22564e4d8cb1a59f997f5b4c",
+                "span_id": "cf9d648ee0cf430e",
+                "parent_span_id": null,
+                "name": "AgentTaskExecution:task_calc_finance",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488227493888,
+                "end_time_unix_nano": 1793979488227503104,
+                "attributes": {
+                  "agent.id": "CustomerOpsAgent",
+                  "agent.version": "v2.0.0-optimized",
+                  "agent.prompt_version": "prompt-v2-chain-of-tools",
+                  "agent.success": true,
+                  "agent.total_tokens": 735,
+                  "agent.cost_usd": 0.0038,
+                  "agent.step_count": 2
+                },
+                "status": {
+                  "code": "STATUS_CODE_OK",
+                  "message": ""
+                }
+              },
+              {
+                "trace_id": "8a538c8f22564e4d8cb1a59f997f5b4c",
+                "span_id": "9c2cc1ca068d43d5",
+                "parent_span_id": "cf9d648ee0cf430e",
+                "name": "Step:1",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488227493888,
+                "end_time_unix_nano": 1793979488537494016,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 280,
+                  "gen_ai.completion_tokens": 60,
+                  "agent.thought": "Estraggo i dati esatti con il tool financial_db e passo a calculator."
+                }
+              },
+              {
+                "trace_id": "8a538c8f22564e4d8cb1a59f997f5b4c",
+                "span_id": "e3b6afcc81954547",
+                "parent_span_id": "9c2cc1ca068d43d5",
+                "name": "Tool:financial_db",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488227493888,
+                "end_time_unix_nano": 1793979488377494016,
+                "attributes": {
+                  "tool.name": "financial_db",
+                  "tool.arguments": "{\"quarter\": [\"Q1\", \"Q2\"]}",
+                  "tool.output": "{\"Q1\": 120000, \"Q2\": 156000}",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "8a538c8f22564e4d8cb1a59f997f5b4c",
+                "span_id": "b0311b49dca9468d",
+                "parent_span_id": "9c2cc1ca068d43d5",
+                "name": "Tool:calculator",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488227493888,
+                "end_time_unix_nano": 1793979488237494016,
+                "attributes": {
+                  "tool.name": "calculator",
+                  "tool.arguments": "{\"expr\": \"((156000 - 120000) / 120000) * 100\"}",
+                  "tool.output": "\"30.0\"",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "8a538c8f22564e4d8cb1a59f997f5b4c",
+                "span_id": "45af0c01ccdc447e",
+                "parent_span_id": "cf9d648ee0cf430e",
+                "name": "Step:2",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488537494016,
+                "end_time_unix_nano": 1793979488747493888,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 360,
+                  "gen_ai.completion_tokens": 35,
+                  "agent.thought": "Formula confermata: incremento del 30%."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resource_spans": [
+      {
+        "resource": {
+          "attributes": {
+            "service.name": "agentarena",
+            "agent.name": "CustomerOpsAgent",
+            "agent.version": "v2.0.0-optimized"
+          }
+        },
+        "scope_spans": [
+          {
+            "scope": {
+              "name": "agentarena.tracer",
+              "version": "1.0.0"
+            },
+            "spans": [
+              {
+                "trace_id": "1bdce361f35f4e42b3cd74424897bee5",
+                "span_id": "4d365204dbc34302",
+                "parent_span_id": null,
+                "name": "AgentTaskExecution:task_multi_source_summary",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488309606912,
+                "end_time_unix_nano": 1793979488342452992,
+                "attributes": {
+                  "agent.id": "CustomerOpsAgent",
+                  "agent.version": "v2.0.0-optimized",
+                  "agent.prompt_version": "prompt-v2-chain-of-tools",
+                  "agent.success": true,
+                  "agent.total_tokens": 510,
+                  "agent.cost_usd": 0.0045,
+                  "agent.step_count": 1
+                },
+                "status": {
+                  "code": "STATUS_CODE_OK",
+                  "message": ""
+                }
+              },
+              {
+                "trace_id": "1bdce361f35f4e42b3cd74424897bee5",
+                "span_id": "42cb6c45f9cf4a47",
+                "parent_span_id": "4d365204dbc34302",
+                "name": "Step:1",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488309606912,
+                "end_time_unix_nano": 1793979488929606912,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 460,
+                  "gen_ai.completion_tokens": 50,
+                  "agent.thought": "Cerco e parso con precisione i prezzi dei competitor."
+                }
+              },
+              {
+                "trace_id": "1bdce361f35f4e42b3cd74424897bee5",
+                "span_id": "bb32ab3d132a4045",
+                "parent_span_id": "42cb6c45f9cf4a47",
+                "name": "Tool:web_search",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488309606912,
+                "end_time_unix_nano": 1793979488709607168,
+                "attributes": {
+                  "tool.name": "web_search",
+                  "tool.arguments": "{\"query\": \"Competitor X Y Pro plan pricing\"}",
+                  "tool.output": "\"Pricing URLs found\"",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "1bdce361f35f4e42b3cd74424897bee5",
+                "span_id": "04c51b1ee7284c70",
+                "parent_span_id": "42cb6c45f9cf4a47",
+                "name": "Tool:html_parser",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488309606912,
+                "end_time_unix_nano": 1793979488619607040,
+                "attributes": {
+                  "tool.name": "html_parser",
+                  "tool.arguments": "{\"url\": \"competitor.com\"}",
+                  "tool.output": "\"Competitor X: $29/mo, Competitor Y: $35/mo\"",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "1bdce361f35f4e42b3cd74424897bee5",
+                "span_id": "d2e24ea4d26548c5",
+                "parent_span_id": "42cb6c45f9cf4a47",
+                "name": "Tool:summarizer",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488309606912,
+                "end_time_unix_nano": 1793979488489607168,
+                "attributes": {
+                  "tool.name": "summarizer",
+                  "tool.arguments": "{\"text\": \"Competitor X: $29/mo, Competitor Y: $35/mo\"}",
+                  "tool.output": "\"Summary verified\"",
+                  "tool.status": "success"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resource_spans": [
+      {
+        "resource": {
+          "attributes": {
+            "service.name": "agentarena",
+            "agent.name": "CustomerOpsAgent",
+            "agent.version": "v2.0.0-optimized"
+          }
+        },
+        "scope_spans": [
+          {
+            "scope": {
+              "name": "agentarena.tracer",
+              "version": "1.0.0"
+            },
+            "spans": [
+              {
+                "trace_id": "c6dd66c894fb49ff8e9856a6a75ad7ad",
+                "span_id": "f940cf1c7a61470d",
+                "parent_span_id": null,
+                "name": "AgentTaskExecution:task_security_auth_audit",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488343173888,
+                "end_time_unix_nano": 1793979488375656960,
+                "attributes": {
+                  "agent.id": "CustomerOpsAgent",
+                  "agent.version": "v2.0.0-optimized",
+                  "agent.prompt_version": "prompt-v2-chain-of-tools",
+                  "agent.success": true,
+                  "agent.total_tokens": 805,
+                  "agent.cost_usd": 0.0039,
+                  "agent.step_count": 2
+                },
+                "status": {
+                  "code": "STATUS_CODE_OK",
+                  "message": ""
+                }
+              },
+              {
+                "trace_id": "c6dd66c894fb49ff8e9856a6a75ad7ad",
+                "span_id": "57d8307d0f35485e",
+                "parent_span_id": "f940cf1c7a61470d",
+                "name": "Step:1",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488343173888,
+                "end_time_unix_nano": 1793979488563173888,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 320,
+                  "gen_ai.completion_tokens": 35,
+                  "agent.thought": "Scansiono i token JWT di user_8829 per scadenze e anomalie."
+                }
+              },
+              {
+                "trace_id": "c6dd66c894fb49ff8e9856a6a75ad7ad",
+                "span_id": "b146a9e4bc104c7f",
+                "parent_span_id": "57d8307d0f35485e",
+                "name": "Tool:token_inspector",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488343173888,
+                "end_time_unix_nano": 1793979488523174144,
+                "attributes": {
+                  "tool.name": "token_inspector",
+                  "tool.arguments": "{\"user\": \"user_8829\"}",
+                  "tool.output": "{\"expired\": [\"tok_91a\", \"tok_44b\"], \"valid\": [\"tok_99z\"]}",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "c6dd66c894fb49ff8e9856a6a75ad7ad",
+                "span_id": "fc0fca43fec745f7",
+                "parent_span_id": "f940cf1c7a61470d",
+                "name": "Step:2",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488563173888,
+                "end_time_unix_nano": 1793979488873174016,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 410,
+                  "gen_ai.completion_tokens": 40,
+                  "agent.thought": "Aggiungo i 2 token scaduti alla blacklist Redis e registro audit log."
+                }
+              },
+              {
+                "trace_id": "c6dd66c894fb49ff8e9856a6a75ad7ad",
+                "span_id": "4d8b2bcaa0ef4349",
+                "parent_span_id": "fc0fca43fec745f7",
+                "name": "Tool:redis_blacklist",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488563173888,
+                "end_time_unix_nano": 1793979488643173888,
+                "attributes": {
+                  "tool.name": "redis_blacklist",
+                  "tool.arguments": "{\"tokens\": [\"tok_91a\", \"tok_44b\"]}",
+                  "tool.output": "{\"blacklisted\": 2}",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "c6dd66c894fb49ff8e9856a6a75ad7ad",
+                "span_id": "ad81f185250a4c56",
+                "parent_span_id": "fc0fca43fec745f7",
+                "name": "Tool:audit_logger",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488563173888,
+                "end_time_unix_nano": 1793979488683173888,
+                "attributes": {
+                  "tool.name": "audit_logger",
+                  "tool.arguments": "{\"action\": \"revoke_tokens\", \"count\": 2}",
+                  "tool.output": "{\"status\": \"logged\"}",
+                  "tool.status": "success"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resource_spans": [
+      {
+        "resource": {
+          "attributes": {
+            "service.name": "agentarena",
+            "agent.name": "CustomerOpsAgent",
+            "agent.version": "v2.0.0-optimized"
+          }
+        },
+        "scope_spans": [
+          {
+            "scope": {
+              "name": "agentarena.tracer",
+              "version": "1.0.0"
+            },
+            "spans": [
+              {
+                "trace_id": "90b1a06cf8b845cda9b5bf6b0d3a5154",
+                "span_id": "a82d038510624e8e",
+                "parent_span_id": null,
+                "name": "AgentTaskExecution:task_sql_bug_investigation",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488263847936,
+                "end_time_unix_nano": 1793979488308881920,
+                "attributes": {
+                  "agent.id": "CustomerOpsAgent",
+                  "agent.version": "v2.0.0-optimized",
+                  "agent.prompt_version": "prompt-v2-chain-of-tools",
+                  "agent.success": true,
+                  "agent.total_tokens": 1045,
+                  "agent.cost_usd": 0.0059,
+                  "agent.step_count": 2
+                },
+                "status": {
+                  "code": "STATUS_CODE_OK",
+                  "message": ""
+                }
+              },
+              {
+                "trace_id": "90b1a06cf8b845cda9b5bf6b0d3a5154",
+                "span_id": "d209e1840ce549fb",
+                "parent_span_id": "a82d038510624e8e",
+                "name": "Step:1",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488263847936,
+                "end_time_unix_nano": 1793979488653847808,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 410,
+                  "gen_ai.completion_tokens": 45,
+                  "agent.thought": "Eseguo EXPLAIN per analizzare il piano di esecuzione."
+                }
+              },
+              {
+                "trace_id": "90b1a06cf8b845cda9b5bf6b0d3a5154",
+                "span_id": "9e78bb7dc2674048",
+                "parent_span_id": "d209e1840ce549fb",
+                "name": "Tool:explain_query",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488263847936,
+                "end_time_unix_nano": 1793979488563847680,
+                "attributes": {
+                  "tool.name": "explain_query",
+                  "tool.arguments": "{\"query\": \"SELECT * FROM events WHERE user_id = 42\"}",
+                  "tool.output": "{\"plan\": \"Seq Scan on events (cost=0.00..125000.00)\"}",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "90b1a06cf8b845cda9b5bf6b0d3a5154",
+                "span_id": "4a0b3df1786b4cfb",
+                "parent_span_id": "a82d038510624e8e",
+                "name": "Step:2",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488653847808,
+                "end_time_unix_nano": 1793979489233847808,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 520,
+                  "gen_ai.completion_tokens": 70,
+                  "agent.thought": "Rilevata scansione sequenziale su tabella grande. Ispeziono indici correnti."
+                }
+              },
+              {
+                "trace_id": "90b1a06cf8b845cda9b5bf6b0d3a5154",
+                "span_id": "c7434f5a02104649",
+                "parent_span_id": "4a0b3df1786b4cfb",
+                "name": "Tool:schema_inspector",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488653847808,
+                "end_time_unix_nano": 1793979488763847936,
+                "attributes": {
+                  "tool.name": "schema_inspector",
+                  "tool.arguments": "{\"table\": \"events\"}",
+                  "tool.output": "{\"indexes\": [\"PRIMARY KEY id\"]}",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "90b1a06cf8b845cda9b5bf6b0d3a5154",
+                "span_id": "671a49b13c7648cf",
+                "parent_span_id": "4a0b3df1786b4cfb",
+                "name": "Tool:sql_executor",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488653847808,
+                "end_time_unix_nano": 1793979489073848064,
+                "attributes": {
+                  "tool.name": "sql_executor",
+                  "tool.arguments": "{\"sql\": \"CREATE INDEX idx_events_user_id ON events(user_id);\"}",
+                  "tool.output": "\"Index created successfully\"",
+                  "tool.status": "success"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resource_spans": [
+      {
+        "resource": {
+          "attributes": {
+            "service.name": "agentarena",
+            "agent.name": "CustomerOpsAgent",
+            "agent.version": "v2.0.0-optimized"
+          }
+        },
+        "scope_spans": [
+          {
+            "scope": {
+              "name": "agentarena.tracer",
+              "version": "1.0.0"
+            },
+            "spans": [
+              {
+                "trace_id": "f087c1aadb154621bcdd56ca3a7b0bdb",
+                "span_id": "fe9281ded073444a",
+                "parent_span_id": null,
+                "name": "AgentTaskExecution:task_support_refund",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488228052992,
+                "end_time_unix_nano": 1793979488263078912,
+                "attributes": {
+                  "agent.id": "CustomerOpsAgent",
+                  "agent.version": "v2.0.0-optimized",
+                  "agent.prompt_version": "prompt-v2-chain-of-tools",
+                  "agent.success": true,
+                  "agent.total_tokens": 685,
+                  "agent.cost_usd": 0.0041,
+                  "agent.step_count": 2
+                },
+                "status": {
+                  "code": "STATUS_CODE_OK",
+                  "message": ""
+                }
+              },
+              {
+                "trace_id": "f087c1aadb154621bcdd56ca3a7b0bdb",
+                "span_id": "ce66d67518e04ef5",
+                "parent_span_id": "fe9281ded073444a",
+                "name": "Step:1",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488228052992,
+                "end_time_unix_nano": 1793979488478053120,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 240,
+                  "gen_ai.completion_tokens": 25,
+                  "agent.thought": "Controllo eleggibilit\u00e0 ordine ORD-9821."
+                }
+              },
+              {
+                "trace_id": "f087c1aadb154621bcdd56ca3a7b0bdb",
+                "span_id": "0ffdf983d85647f3",
+                "parent_span_id": "ce66d67518e04ef5",
+                "name": "Tool:lookup_order",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488228052992,
+                "end_time_unix_nano": 1793979488348052992,
+                "attributes": {
+                  "tool.name": "lookup_order",
+                  "tool.arguments": "{\"id\": \"ORD-9821\"}",
+                  "tool.output": "{\"eligible\": true, \"amount\": 45}",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "f087c1aadb154621bcdd56ca3a7b0bdb",
+                "span_id": "54b5a53ca29a41d1",
+                "parent_span_id": "fe9281ded073444a",
+                "name": "Step:2",
+                "kind": "SPAN_KIND_INTERNAL",
+                "start_time_unix_nano": 1793979488478053120,
+                "end_time_unix_nano": 1793979488928053248,
+                "attributes": {
+                  "gen_ai.prompt_tokens": 380,
+                  "gen_ai.completion_tokens": 40,
+                  "agent.thought": "Eseguo rimborso e notifica cliente in parallelo."
+                }
+              },
+              {
+                "trace_id": "f087c1aadb154621bcdd56ca3a7b0bdb",
+                "span_id": "2c43d511a4e4473a",
+                "parent_span_id": "54b5a53ca29a41d1",
+                "name": "Tool:process_refund",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488478053120,
+                "end_time_unix_nano": 1793979488798053120,
+                "attributes": {
+                  "tool.name": "process_refund",
+                  "tool.arguments": "{\"order_id\": \"ORD-9821\", \"amount\": 45}",
+                  "tool.output": "{\"status\": \"ok\", \"refund_id\": \"RF-11\"}",
+                  "tool.status": "success"
+                }
+              },
+              {
+                "trace_id": "f087c1aadb154621bcdd56ca3a7b0bdb",
+                "span_id": "35d25c6762e44cc1",
+                "parent_span_id": "54b5a53ca29a41d1",
+                "name": "Tool:send_notification",
+                "kind": "SPAN_KIND_CLIENT",
+                "start_time_unix_nano": 1793979488478053120,
+                "end_time_unix_nano": 1793979488628053248,
+                "attributes": {
+                  "tool.name": "send_notification",
+                  "tool.arguments": "{\"to\": \"user@example.com\", \"msg\": \"Refund processed\"}",
+                  "tool.output": "\"sent\"",
+                  "tool.status": "success"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

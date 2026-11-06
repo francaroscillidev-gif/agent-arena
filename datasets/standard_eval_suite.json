@@ -1,0 +1,57 @@
+[
+  {
+    "id": "task_calc_finance",
+    "name": "Calculate Quarterly Revenue Growth",
+    "description": "Fetch Q1 and Q2 financial data from db and compute percentage growth.",
+    "category": "Financial Analysis",
+    "difficulty": "easy",
+    "prompt": "Calcola la percentuale di crescita dei ricavi tra Q1 ($120k) e Q2 ($156k).",
+    "expected_output": "30%",
+    "expected_tools": ["calculator", "financial_db"],
+    "max_steps": 3
+  },
+  {
+    "id": "task_support_refund",
+    "name": "Process E-Commerce Refund",
+    "description": "Verify order eligibility, check return policy limits, issue refund, and send email.",
+    "category": "Customer Support",
+    "difficulty": "medium",
+    "prompt": "L'utente con ordine ORD-9821 chiede rimborso per un articolo difettoso di €45. Verifica idoneità e rimborsa.",
+    "expected_output": "Refund successful",
+    "expected_tools": ["lookup_order", "process_refund", "send_notification"],
+    "max_steps": 5
+  },
+  {
+    "id": "task_sql_bug_investigation",
+    "name": "Diagnose Database Performance Drop",
+    "description": "Analyze query plan, identify missing index on users table, and suggest DDL patch.",
+    "category": "DevOps & DB",
+    "difficulty": "hard",
+    "prompt": "Indaga perché la query SELECT * FROM events WHERE user_id = 42 impiega 4.2 secondi e fornisci soluzione.",
+    "expected_output": "CREATE INDEX",
+    "expected_tools": ["explain_query", "schema_inspector", "sql_executor"],
+    "max_steps": 6
+  },
+  {
+    "id": "task_multi_source_summary",
+    "name": "Multi-Source Market Research Summary",
+    "description": "Search web for latest competitor pricing, parse tables, and summarize.",
+    "category": "Information Retrieval",
+    "difficulty": "medium",
+    "prompt": "Cerca e confronta i prezzi attuali di Competitor X e Competitor Y per il tier Pro.",
+    "expected_output": "Competitor X: $29/mo, Competitor Y: $35/mo",
+    "expected_tools": ["web_search", "html_parser", "summarizer"],
+    "max_steps": 4
+  },
+  {
+    "id": "task_security_auth_audit",
+    "name": "Audit API Token Expiration & Revocation",
+    "description": "Inspect JWT tokens, check revoked blacklist in Redis and revoke expired sessions.",
+    "category": "Security & Auth",
+    "difficulty": "medium",
+    "prompt": "Verifica i token attivi per utente user_8829: identifica eventuali token scaduti o compromessi e revocali.",
+    "expected_output": "Revoked 2 tokens",
+    "expected_tools": ["token_inspector", "redis_blacklist", "audit_logger"],
+    "max_steps": 4
+  }
+]

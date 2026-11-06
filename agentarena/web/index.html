@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentArena - Benchmark & Side-by-Side Evaluation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0B0F19;
+      color: #E2E8F0;
+    }
+    .code-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(18, 24, 38, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0F19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2D3748;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4A5568;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="border-b border-slate-800 bg-slate-900/60 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i class="fa-solid fa-microchip text-white text-lg"></i>
+        </div>
+        <div>
+          <span class="font-bold text-xl tracking-tight text-white flex items-center gap-2">
+            AgentArena <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-medium">Harness v1.0</span>
+          </span>
+          <p class="text-xs text-slate-400">Agent Benchmarking, Trajectory Tracing & Side-by-Side Diff</p>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex items-center space-x-3">
+        <button onclick="runBenchmark('baseline')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-play text-indigo-400 text-[10px]"></i> Run v1 Baseline
+        </button>
+        <button onclick="runBenchmark('optimized')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rocket text-[10px]"></i> Run v2 Optimized
+        </button>
+        <button onclick="refreshData()" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition" title="Ricarica">
+          <i class="fa-solid fa-arrows-rotate text-sm"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 space-y-6">
+
+    <!-- VERSION SELECTOR BANNER -->
+    <div class="glass-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 border border-indigo-500/10">
+      <div class="flex items-center space-x-4">
+        <div>
+          <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Baseline Model (A)</label>
+          <select id="selectModelA" onchange="renderComparison()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-200 focus:outline-none focus:border-indigo-500">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+        <div class="text-slate-500 text-xl font-bold mt-4">VS</div>
+        <div>
+          <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Candidate Model (B)</label>
+          <select id="selectModelB" onchange="renderComparison()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-200 focus:outline-none focus:border-indigo-500">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick delta badges -->
+      <div id="quickDeltas" class="flex items-center gap-4 text-xs font-medium">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- AGGREGATE KPIS COMPARISON -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="glass-card rounded-xl p-4 relative overflow-hidden">
+        <div class="text-xs text-slate-400 uppercase font-semibold">Success Rate</div>
+        <div class="flex items-baseline justify-between mt-2">
+          <div id="kpiSuccessA" class="text-2xl font-bold text-slate-200">-%</div>
+          <i class="fa-solid fa-arrow-right text-slate-600 text-xs"></i>
+          <div id="kpiSuccessB" class="text-2xl font-bold text-emerald-400">-%</div>
+        </div>
+        <div id="kpiSuccessDelta" class="text-xs mt-1 text-slate-500">-</div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 relative overflow-hidden">
+        <div class="text-xs text-slate-400 uppercase font-semibold">Avg Latency / Task</div>
+        <div class="flex items-baseline justify-between mt-2">
+          <div id="kpiDurationA" class="text-2xl font-bold text-slate-200">-s</div>
+          <i class="fa-solid fa-arrow-right text-slate-600 text-xs"></i>
+          <div id="kpiDurationB" class="text-2xl font-bold text-indigo-400">-s</div>
+        </div>
+        <div id="kpiDurationDelta" class="text-xs mt-1 text-slate-500">-</div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 relative overflow-hidden">
+        <div class="text-xs text-slate-400 uppercase font-semibold">Avg Tokens Consumed</div>
+        <div class="flex items-baseline justify-between mt-2">
+          <div id="kpiTokensA" class="text-2xl font-bold text-slate-200">-</div>
+          <i class="fa-solid fa-arrow-right text-slate-600 text-xs"></i>
+          <div id="kpiTokensB" class="text-2xl font-bold text-cyan-400">-</div>
+        </div>
+        <div id="kpiTokensDelta" class="text-xs mt-1 text-slate-500">-</div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 relative overflow-hidden">
+        <div class="text-xs text-slate-400 uppercase font-semibold">Avg Step Count</div>
+        <div class="flex items-baseline justify-between mt-2">
+          <div id="kpiStepsA" class="text-2xl font-bold text-slate-200">-</div>
+          <i class="fa-solid fa-arrow-right text-slate-600 text-xs"></i>
+          <div id="kpiStepsB" class="text-2xl font-bold text-purple-400">-</div>
+        </div>
+        <div id="kpiStepsDelta" class="text-xs mt-1 text-slate-500">-</div>
+      </div>
+    </div>
+
+    <!-- COMPARISON TABS & RADAR / CHART VIEW -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Benchmark Tasks Matrix -->
+      <div class="lg:col-span-2 glass-card rounded-xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold uppercase tracking-wide text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-indigo-400"></i> Benchmark Tasks Breakdown
+          </h2>
+          <span class="text-xs text-slate-500" id="taskCountLabel">0 compiti testati</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase">
+                <th class="py-2.5 px-3">Task ID & Name</th>
+                <th class="py-2.5 px-3 text-center">Version A</th>
+                <th class="py-2.5 px-3 text-center">Version B</th>
+                <th class="py-2.5 px-3 text-center">Token Delta</th>
+                <th class="py-2.5 px-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tasksTableBody" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Radar Comparison Chart -->
+      <div class="glass-card rounded-xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-bold uppercase tracking-wide text-slate-300 flex items-center gap-2">
+              <i class="fa-solid fa-chart-radar text-purple-400"></i> Multidimensional Delta
+            </h2>
+          </div>
+          <div class="h-60 relative flex items-center justify-center">
+            <canvas id="radarChart"></canvas>
+          </div>
+        </div>
+        <div class="text-[11px] text-slate-400 pt-3 border-t border-slate-800 mt-2">
+          Punteggio normalizzato (1.0 = Max efficienza). Valuta tool accuracy, token economy, rapidità e tasso di successo.
+        </div>
+      </div>
+    </div>
+
+    <!-- DEEP DIVE TRAJECTORY COMPARISON (SIDE-BY-SIDE MODAL / VIEW) -->
+    <div id="trajectorySection" class="glass-card rounded-xl p-6 border-indigo-500/30">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-xs font-bold" id="detailCategory">Customer Support</span>
+            <h3 class="text-base font-bold text-white" id="detailTaskTitle">Seleziona un task per vedere la traiettoria side-by-side</h3>
+          </div>
+          <p class="text-xs text-slate-400 mt-1 code-font" id="detailPrompt">Prompt...</p>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-500">Expected Output:</span>
+          <p class="text-xs text-emerald-400 font-semibold code-font" id="detailExpected">-</p>
+        </div>
+      </div>
+
+      <!-- 2 Columns: Version A vs Version B Trajectory -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <!-- Col A -->
+        <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-800 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 rounded-full bg-slate-500"></span>
+              <span class="font-bold text-sm text-slate-200" id="colTitleA">Version A</span>
+            </div>
+            <span id="colStatusA" class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Success</span>
+          </div>
+
+          <!-- Step Trace Container -->
+          <div class="space-y-3 mt-4 flex-1 overflow-y-auto max-h-[480px] pr-2" id="stepsA">
+            <!-- Steps rendered dynamically -->
+          </div>
+
+          <!-- LLM-as-a-Judge Badge Section -->
+          <div class="mt-3 pt-3 border-t border-slate-800" id="judgeContainerA">
+            <div class="text-[11px] font-bold uppercase text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-gavel text-amber-400"></i> LLM-as-a-Judge Evaluation
+            </div>
+            <div id="judgeMetricsA" class="space-y-1 text-xs"></div>
+          </div>
+
+          <!-- Output summary -->
+          <div class="mt-3 pt-3 border-t border-slate-800 text-xs">
+            <div class="text-slate-400 font-semibold mb-1">Final Output:</div>
+            <div id="finalOutputA" class="bg-slate-950 p-2.5 rounded border border-slate-800 text-slate-300 code-font text-[11px]"></div>
+          </div>
+        </div>
+
+        <!-- Col B -->
+        <div class="bg-slate-900/90 rounded-xl p-4 border border-indigo-500/30 flex flex-col relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+              <span class="font-bold text-sm text-indigo-300" id="colTitleB">Version B (Candidate)</span>
+            </div>
+            <span id="colStatusB" class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Success</span>
+          </div>
+
+          <!-- Step Trace Container -->
+          <div class="space-y-3 mt-4 flex-1 overflow-y-auto max-h-[480px] pr-2" id="stepsB">
+            <!-- Steps rendered dynamically -->
+          </div>
+
+          <!-- LLM-as-a-Judge Badge Section -->
+          <div class="mt-3 pt-3 border-t border-slate-800" id="judgeContainerB">
+            <div class="text-[11px] font-bold uppercase text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-gavel text-indigo-400"></i> LLM-as-a-Judge Evaluation
+            </div>
+            <div id="judgeMetricsB" class="space-y-1 text-xs"></div>
+          </div>
+
+          <!-- Output summary -->
+          <div class="mt-3 pt-3 border-t border-slate-800 text-xs">
+            <div class="text-slate-400 font-semibold mb-1">Final Output:</div>
+            <div id="finalOutputB" class="bg-slate-950 p-2.5 rounded border border-slate-800 text-slate-300 code-font text-[11px]"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-900 py-4 text-center text-xs text-slate-600">
+    AgentArena &copy; Open-Source Benchmark Harness for Autonomous Agents & Tool Calling Workflows
+  </footer>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    let currentVersions = [];
+    let currentVersionData = {};
+    let radarChartInstance = null;
+    let selectedTaskId = "task_calc_finance";
+
+    async function init() {
+      await refreshData();
+    }
+
+    async function refreshData() {
+      try {
+        const res = await fetch('/api/versions');
+        const data = await res.json();
+        currentVersions = data.versions || [];
+
+        const selA = document.getElementById('selectModelA');
+        const selB = document.getElementById('selectModelB');
+
+        const prevA = selA.value;
+        const prevB = selB.value;
+
+        selA.innerHTML = '';
+        selB.innerHTML = '';
+
+        currentVersions.forEach((v, idx) => {
+          const optA = new Option(v, v);
+          const optB = new Option(v, v);
+          selA.add(optA);
+          selB.add(optB);
+        });
+
+        if (currentVersions.length >= 2) {
+          selA.value = prevA && currentVersions.includes(prevA) ? prevA : currentVersions[0];
+          selB.value = prevB && currentVersions.includes(prevB) ? prevB : currentVersions[1];
+        } else if (currentVersions.length === 1) {
+          selA.value = currentVersions[0];
+          selB.value = currentVersions[0];
+        }
+
+        await renderComparison();
+      } catch (err) {
+        console.error("Failed to load versions:", err);
+      }
+    }
+
+    async function renderComparison() {
+      const vA = document.getElementById('selectModelA').value;
+      const vB = document.getElementById('selectModelB').value;
+
+      if (!vA || !vB) return;
+
+      const [resA, resB] = await Promise.all([
+        fetch(`/api/runs/${vA}`).then(r => r.json()),
+        fetch(`/api/runs/${vB}`).then(r => r.json())
+      ]);
+
+      const [summaryA, summaryB] = await Promise.all([
+        fetch(`/api/summary/${vA}`).then(r => r.json()),
+        fetch(`/api/summary/${vB}`).then(r => r.json())
+      ]);
+
+      updateKPIs(summaryA, summaryB);
+      updateTaskTable(resA.runs, resB.runs);
+      renderRadar(summaryA, summaryB);
+      renderTrajectoryDeepDive(resA.runs, resB.runs, selectedTaskId, vA, vB);
+    }
+
+    function updateKPIs(sA, sB) {
+      document.getElementById('kpiSuccessA').innerText = `${sA.success_rate}%`;
+      document.getElementById('kpiSuccessB').innerText = `${sB.success_rate}%`;
+      const sDelta = (sB.success_rate - sA.success_rate).toFixed(1);
+      const sDeltaEl = document.getElementById('kpiSuccessDelta');
+      sDeltaEl.innerText = `${sDelta > 0 ? '+' : ''}${sDelta}% vs Baseline`;
+      sDeltaEl.className = `text-xs mt-1 ${sDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+      document.getElementById('kpiDurationA').innerText = `${sA.avg_duration}s`;
+      document.getElementById('kpiDurationB').innerText = `${sB.avg_duration}s`;
+      const dDelta = (sB.avg_duration - sA.avg_duration).toFixed(2);
+      const dDeltaEl = document.getElementById('kpiDurationDelta');
+      dDeltaEl.innerText = `${dDelta > 0 ? '+' : ''}${dDelta}s ${dDelta <= 0 ? 'faster' : 'slower'}`;
+      dDeltaEl.className = `text-xs mt-1 ${dDelta <= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+      document.getElementById('kpiTokensA').innerText = sA.avg_tokens;
+      document.getElementById('kpiTokensB').innerText = sB.avg_tokens;
+      const tDelta = Math.round(sB.avg_tokens - sA.avg_tokens);
+      const tDeltaEl = document.getElementById('kpiTokensDelta');
+      tDeltaEl.innerText = `${tDelta > 0 ? '+' : ''}${tDelta} tokens (${((tDelta / (sA.avg_tokens || 1)) * 100).toFixed(0)}%)`;
+      tDeltaEl.className = `text-xs mt-1 ${tDelta <= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+      document.getElementById('kpiStepsA').innerText = sA.avg_steps;
+      document.getElementById('kpiStepsB').innerText = sB.avg_steps;
+      const stepDelta = (sB.avg_steps - sA.avg_steps).toFixed(1);
+      const stepDeltaEl = document.getElementById('kpiStepsDelta');
+      stepDeltaEl.innerText = `${stepDelta > 0 ? '+' : ''}${stepDelta} steps avg`;
+      stepDeltaEl.className = `text-xs mt-1 ${stepDelta <= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+    }
+
+    function updateTaskTable(runsA, runsB) {
+      const tbody = document.getElementById('tasksTableBody');
+      tbody.innerHTML = '';
+
+      const taskMapA = {};
+      runsA.forEach(r => taskMapA[r.task_id] = r);
+      const taskMapB = {};
+      runsB.forEach(r => taskMapB[r.task_id] = r);
+
+      const allTaskIds = Array.from(new Set([...Object.keys(taskMapA), ...Object.keys(taskMapB)]));
+      document.getElementById('taskCountLabel').innerText = `${allTaskIds.length} benchmark task analizzati`;
+
+      allTaskIds.forEach(id => {
+        const itemA = taskMapA[id];
+        const itemB = taskMapB[id];
+
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-slate-800/40 cursor-pointer transition ${selectedTaskId === id ? 'bg-indigo-950/30 border-l-2 border-indigo-500' : ''}`;
+        tr.onclick = () => {
+          selectedTaskId = id;
+          const vA = document.getElementById('selectModelA').value;
+          const vB = document.getElementById('selectModelB').value;
+          renderTrajectoryDeepDive(runsA, runsB, id, vA, vB);
+          updateTaskTable(runsA, runsB);
+        };
+
+        const tokensA = itemA ? itemA.total_tokens : 0;
+        const tokensB = itemB ? itemB.total_tokens : 0;
+        const diffTokens = tokensB - tokensA;
+
+        tr.innerHTML = `
+          <td class="py-3 px-3">
+            <div class="font-bold text-slate-200">${id}</div>
+            <div class="text-[11px] text-slate-400">${itemB?.agent_id || itemA?.agent_id || 'Task'}</div>
+          </td>
+          <td class="py-3 px-3 text-center">
+            ${itemA ? (itemA.success 
+              ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-check mr-1"></i>PASS</span>' 
+              : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-xmark mr-1"></i>FAIL</span>') 
+              : '-'}
+            <div class="text-[10px] text-slate-500 mt-1">${itemA?.duration_seconds || 0}s &bull; ${tokensA} tok</div>
+          </td>
+          <td class="py-3 px-3 text-center">
+            ${itemB ? (itemB.success 
+              ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-check mr-1"></i>PASS</span>' 
+              : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-xmark mr-1"></i>FAIL</span>') 
+              : '-'}
+            <div class="text-[10px] text-slate-500 mt-1">${itemB?.duration_seconds || 0}s &bull; ${tokensB} tok</div>
+          </td>
+          <td class="py-3 px-3 text-center">
+            <span class="text-xs font-semibold ${diffTokens <= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+              ${diffTokens > 0 ? '+' : ''}${diffTokens}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-right">
+            <button class="px-2.5 py-1 text-[11px] font-semibold rounded bg-slate-800 hover:bg-indigo-600 hover:text-white transition">
+              Inspect Diff
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderRadar(sA, sB) {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      if (radarChartInstance) {
+        radarChartInstance.destroy();
+      }
+
+      // Normalized metrics 0 to 100
+      const dataA = [
+        sA.success_rate || 10,
+        Math.max(10, 100 - (sA.avg_tokens / 20)),
+        Math.max(10, 100 - (sA.avg_duration * 15)),
+        Math.max(10, 100 - (sA.avg_steps * 15))
+      ];
+
+      const dataB = [
+        sB.success_rate || 10,
+        Math.max(10, 100 - (sB.avg_tokens / 20)),
+        Math.max(10, 100 - (sB.avg_duration * 15)),
+        Math.max(10, 100 - (sB.avg_steps * 15))
+      ];
+
+      radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['Accuracy', 'Token Economy', 'Speed', 'Step Compactness'],
+          datasets: [
+            {
+              label: sA.version || 'Version A',
+              data: dataA,
+              backgroundColor: 'rgba(148, 163, 184, 0.2)',
+              borderColor: 'rgba(148, 163, 184, 0.8)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgba(148, 163, 184, 1)'
+            },
+            {
+              label: sB.version || 'Version B',
+              data: dataB,
+              backgroundColor: 'rgba(99, 102, 241, 0.25)',
+              borderColor: 'rgba(99, 102, 241, 1)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgba(99, 102, 241, 1)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(255, 255, 255, 0.08)' },
+              grid: { color: 'rgba(255, 255, 255, 0.08)' },
+              pointLabels: {
+                color: '#94A3B8',
+                font: { size: 10, family: 'Plus Jakarta Sans' }
+              },
+              ticks: { display: false, max: 100, min: 0 }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#E2E8F0', font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function renderTrajectoryDeepDive(runsA, runsB, taskId, nameA, nameB) {
+      const trajA = runsA.find(r => r.task_id === taskId);
+      const trajB = runsB.find(r => r.task_id === taskId);
+
+      document.getElementById('colTitleA').innerText = nameA;
+      document.getElementById('colTitleB').innerText = nameB;
+
+      document.getElementById('detailTaskTitle').innerText = taskId;
+
+      // Status Badges
+      if (trajA) {
+        document.getElementById('colStatusA').className = `px-2 py-0.5 rounded text-[11px] font-bold ${trajA.success ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}`;
+        document.getElementById('colStatusA').innerText = trajA.success ? 'PASSED' : 'FAILED';
+        document.getElementById('finalOutputA').innerText = trajA.final_output || '(Nessun output)';
+        renderSteps('stepsA', trajA.steps);
+        renderJudgeMetrics('judgeMetricsA', trajA.metrics);
+      } else {
+        document.getElementById('stepsA').innerHTML = '<div class="text-xs text-slate-500">Nessun run registrato.</div>';
+        document.getElementById('judgeMetricsA').innerHTML = '';
+      }
+
+      if (trajB) {
+        document.getElementById('colStatusB').className = `px-2 py-0.5 rounded text-[11px] font-bold ${trajB.success ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}`;
+        document.getElementById('colStatusB').innerText = trajB.success ? 'PASSED' : 'FAILED';
+        document.getElementById('finalOutputB').innerText = trajB.final_output || '(Nessun output)';
+        renderSteps('stepsB', trajB.steps);
+        renderJudgeMetrics('judgeMetricsB', trajB.metrics);
+      } else {
+        document.getElementById('stepsB').innerHTML = '<div class="text-xs text-slate-500">Nessun run registrato.</div>';
+        document.getElementById('judgeMetricsB').innerHTML = '';
+      }
+    }
+
+    function renderJudgeMetrics(elementId, metrics) {
+      const container = document.getElementById(elementId);
+      container.innerHTML = '';
+      if (!metrics) return;
+
+      const judgeKeys = Object.keys(metrics).filter(k => k.startsWith('judge_') || metrics[k].name.includes('Judge'));
+      if (judgeKeys.length === 0) {
+        container.innerHTML = '<span class="text-[10px] text-slate-500 italic">Nessuna metrica LLM-Judge disponibile</span>';
+        return;
+      }
+
+      judgeKeys.forEach(k => {
+        const m = metrics[k];
+        const badge = document.createElement('div');
+        badge.className = 'flex items-center justify-between p-1.5 rounded bg-slate-950/60 border border-slate-800 text-[11px]';
+        badge.innerHTML = `
+          <div class="flex items-center space-x-1.5">
+            <span class="w-1.5 h-1.5 rounded-full ${m.passed ? 'bg-emerald-400' : 'bg-rose-400'}"></span>
+            <span class="text-slate-300 font-medium">${m.name}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-mono ${m.score >= 0.8 ? 'text-emerald-400' : (m.score >= 0.5 ? 'text-amber-400' : 'text-rose-400')} font-bold">${m.score.toFixed(2)}</span>
+            <span class="text-[10px] text-slate-500 truncate max-w-[140px]" title="${m.details || ''}">${m.details || ''}</span>
+          </div>
+        `;
+        container.appendChild(badge);
+      });
+    }
+
+    function renderSteps(containerId, steps) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      if (!steps || steps.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-500">Nessuno step registrato.</div>';
+        return;
+      }
+
+      steps.forEach((s) => {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'border border-slate-800 bg-slate-950/70 rounded-lg p-3 space-y-2';
+
+        let toolCallsHtml = '';
+        if (s.tool_calls && s.tool_calls.length > 0) {
+          toolCallsHtml = s.tool_calls.map(tc => `
+            <div class="bg-indigo-950/30 border border-indigo-500/20 rounded p-2 text-[11px] space-y-1">
+              <div class="flex items-center justify-between font-bold text-indigo-300">
+                <span><i class="fa-solid fa-wrench mr-1"></i>${tc.name}</span>
+                <span class="text-slate-500 font-normal text-[10px]">${tc.duration_ms}ms</span>
+              </div>
+              <div class="text-slate-400 code-font text-[10px]">args: ${JSON.stringify(tc.arguments)}</div>
+              <div class="text-emerald-400 code-font text-[10px]">return: ${JSON.stringify(tc.output)}</div>
+            </div>
+          `).join('');
+        }
+
+        stepDiv.innerHTML = `
+          <div class="flex items-center justify-between text-xs border-b border-slate-800/80 pb-1.5">
+            <span class="font-bold text-slate-300">Step #${s.step_number}</span>
+            <span class="text-[10px] text-slate-500 font-mono">${s.prompt_tokens + s.completion_tokens} tok &bull; ${s.latency_ms}ms</span>
+          </div>
+          ${s.thought ? `<div class="text-xs text-slate-400 italic bg-slate-900/40 p-2 rounded border border-slate-800/40"><i class="fa-regular fa-lightbulb text-amber-400 mr-1.5"></i>"${s.thought}"</div>` : ''}
+          ${toolCallsHtml}
+          ${s.output ? `<div class="text-xs text-slate-300 font-mono bg-slate-900 p-2 rounded border border-slate-800">${s.output}</div>` : ''}
+        `;
+        container.appendChild(stepDiv);
+      });
+    }
+
+    async function runBenchmark(kind) {
+      try {
+        const res = await fetch(`/api/run-benchmark?type=${kind}`, { method: 'POST' });
+        const result = await res.json();
+        await refreshData();
+      } catch (err) {
+        alert('Errore esecuzione benchmark: ' + err);
+      }
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
