@@ -1,0 +1,36 @@
+name: AgentArena Benchmark & Regression CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  benchmark-and-guard:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Run Unit Tests
+      run: |
+        python -m unittest discover -s tests
+
+    - name: Run Benchmark Suite
+      run: |
+        python -m agentarena.cli.main benchmark --agent both
+
+    - name: Evaluate Regression Gate
+      run: |
+        python -m agentarena.ci.gate --baseline v1.0.0-baseline --candidate v2.0.0-optimized --max-success-drop 0.0 --max-token-increase 20.0
+
+    - name: Generate PR Markdown Diff Report
+      run: |
+        python -m agentarena.cli.main diff --a v1.0.0-baseline --b v2.0.0-optimized --out benchmark_diff.md
+        cat benchmark_diff.md

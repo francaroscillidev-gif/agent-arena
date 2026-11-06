@@ -36,7 +36,22 @@ python3 -m agentarena.cli.main benchmark --agent both
 python3 -m agentarena.cli.main summary
 ```
 
-### 3. Avviare la Dashboard Web Side-by-Side
+### 3. Generare un Diff Report Markdown tra Versioni
+```bash
+python3 -m agentarena.cli.main diff --a v1.0.0-baseline --b v2.0.0-optimized
+```
+
+### 4. Esportare Tracce in formato OpenTelemetry (OTel)
+```bash
+python3 -m agentarena.cli.main otel --version v2.0.0-optimized --out traces.json
+```
+
+### 5. Regression Gate per CI/CD
+```bash
+python3 -m agentarena.cli.main gate --baseline v1.0.0-baseline --candidate v2.0.0-optimized --max-success-drop 0.0 --max-token-increase 20.0
+```
+
+### 6. Avviare la Dashboard Web Side-by-Side
 ```bash
 python3 -m agentarena.cli.main ui --port 8080
 ```

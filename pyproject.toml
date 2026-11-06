@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentarena"
+version = "1.0.0"
+description = "Lightweight & Modular Agent Evaluation, Trajectory Tracing and Side-by-Side Benchmarking Harness"
+readme = "README.md"
+authors = [
+  { name = "Franca Roscilli", email = "francaroscillidev@gmail.com" }
+]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.urls]
+"Homepage" = "https://github.com/francaroscillidev-gif/agent-arena"
+"Bug Tracker" = "https://github.com/francaroscillidev-gif/agent-arena/issues"
+
+[project.scripts]
+agentarena = "agentarena.cli.main:main"

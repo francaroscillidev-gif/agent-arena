@@ -33,6 +33,13 @@ def main():
     otel_parser.add_argument("--version", required=True, help="Agent version to export")
     otel_parser.add_argument("--out", default=None, help="Optional JSON file path to write spans to")
 
+    # gate command for CI
+    gate_parser = subparsers.add_parser("gate", help="Run CI/CD regression guard check")
+    gate_parser.add_argument("--baseline", required=True, help="Baseline agent version")
+    gate_parser.add_argument("--candidate", required=True, help="Candidate agent version")
+    gate_parser.add_argument("--max-success-drop", type=float, default=0.0)
+    gate_parser.add_argument("--max-token-increase", type=float, default=25.0)
+
     args = parser.parse_args()
 
     storage = RunStorage()
@@ -130,6 +137,19 @@ def main():
             print(f"✅ Esportate {len(all_otel_traces)} tracce OTel in {args.out}")
         else:
             print(output_data[:600] + f"\n... [Truncated: {len(all_otel_traces)} traces available. Use --out to save.]")
+
+    elif args.command == "gate":
+        from agentarena.ci.gate import check_regression
+        passed = check_regression(
+            baseline_version=args.baseline,
+            candidate_version=args.candidate,
+            max_success_drop=args.max_success_drop,
+            max_token_increase_pct=args.max_token_increase
+        )
+        if not passed:
+            sys.exit(1)
+        else:
+            sys.exit(0)
     else:
         parser.print_help()
 
