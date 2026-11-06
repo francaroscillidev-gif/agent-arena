@@ -88,3 +88,12 @@ class MyCustomAgent(BaseAgent):
         traj.finish(success=True, final_output="Risultato")
         return traj
 ```
+
+---
+
+## 👩‍💻 Autore & Maintainer
+
+- **Autore**: Franca Roscilli
+- **Email**: [francaroscillidev@gmail.com](mailto:francaroscillidev@gmail.com)
+- **GitHub**: [@francaroscillidev-gif](https://github.com/francaroscillidev-gif)
+- **Licenza**: MIT
