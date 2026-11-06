@@ -14,6 +14,7 @@ def main():
     # benchmark command
     bench_parser = subparsers.add_parser("benchmark", help="Run benchmark suite on agent versions")
     bench_parser.add_argument("--agent", choices=["baseline", "optimized", "both"], default="both", help="Which agent to benchmark")
+    bench_parser.add_argument("--chaos", action="store_true", help="Enable Chaos Engineering fault injection on tools")
 
     # ui command
     ui_parser = subparsers.add_parser("ui", help="Launch interactive comparison web dashboard")
@@ -52,6 +53,9 @@ def main():
             agents.append(MockLegacyAgent())
         if args.agent in ["optimized", "both"]:
             agents.append(MockOptimizedAgent())
+
+        if args.chaos:
+            print("⚡ ATTIVAZIONE CHAOS ENGINEERING: Simulazione di fallimenti di rete e tool latenti abilitata!\n")
 
         print(f"🎯 Avvio benchmark su {len(tasks)} compiti standard...\n")
         for ag in agents:

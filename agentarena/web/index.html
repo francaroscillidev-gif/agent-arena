@@ -68,6 +68,9 @@
         <button onclick="runBenchmark('optimized')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
           <i class="fa-solid fa-rocket text-[10px]"></i> Run v2 Optimized
         </button>
+        <button onclick="exportOTel()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5" title="Export OpenTelemetry Spans">
+          <i class="fa-solid fa-diagram-project text-cyan-400 text-[10px]"></i> Export OTel
+        </button>
         <button onclick="refreshData()" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition" title="Ricarica">
           <i class="fa-solid fa-arrows-rotate text-sm"></i>
         </button>
@@ -621,6 +624,27 @@
         await refreshData();
       } catch (err) {
         alert('Errore esecuzione benchmark: ' + err);
+      }
+    }
+
+    async function exportOTel() {
+      const v = document.getElementById('selectModelB').value || document.getElementById('selectModelA').value;
+      if (!v) {
+        alert("Seleziona prima una versione!");
+        return;
+      }
+      try {
+        const res = await fetch(`/api/runs/${v}`);
+        const data = await res.json();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `agentarena_${v}_trajectories.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert("Errore esportazione tracce: " + e);
       }
     }
 

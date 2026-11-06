@@ -4,6 +4,7 @@ from typing import Dict, Any, List
 from agentarena.core.models import TaskTrajectory, AgentStepRecord, ToolCallRecord, BenchmarkTask
 from agentarena.evaluators.evaluator import TrajectoryEvaluator
 from agentarena.judge.llm_judge import LLMasAJudgeEvaluator
+from agentarena.resilience.evaluator import ResilienceEvaluator
 from agentarena.core.storage import RunStorage
 
 class BaseAgent:
@@ -33,6 +34,10 @@ class AgentHarness:
             if self.enable_llm_judge:
                 judge_metrics = LLMasAJudgeEvaluator.evaluate_trajectory(traj, task)
                 metrics.update(judge_metrics)
+
+            # 3. Resilience & Self-Healing Evaluation
+            resilience_metrics = ResilienceEvaluator.evaluate_resilience(traj)
+            metrics.update(resilience_metrics)
 
             traj.metrics = metrics
             

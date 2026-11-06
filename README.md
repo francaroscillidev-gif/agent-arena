@@ -51,7 +51,13 @@ python3 -m agentarena.cli.main otel --version v2.0.0-optimized --out traces.json
 python3 -m agentarena.cli.main gate --baseline v1.0.0-baseline --candidate v2.0.0-optimized --max-success-drop 0.0 --max-token-increase 20.0
 ```
 
-### 6. Avviare la Dashboard Web Side-by-Side
+### 7. Chaos Engineering & Fault Resilience Testing
+Simula fallimenti intermittenti dei tool, latenze di rete e payload malformati per valutare la capacità di auto-riparazione (Self-Healing) dell'agente:
+```bash
+python3 -m agentarena.cli.main benchmark --agent both --chaos
+```
+
+### 8. Avviare la Dashboard Web Side-by-Side
 ```bash
 python3 -m agentarena.cli.main ui --port 8080
 ```
