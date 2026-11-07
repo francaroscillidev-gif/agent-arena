@@ -5,6 +5,10 @@
 </p>
 
 <p align="center">
+  <img src="agentarena/web/assets/badge_success.svg" alt="AgentArena Pass Badge" />
+</p>
+
+<p align="center">
   <strong>Framework leggero, modulare e standardizzato per testare, tracciare e confrontare agenti autonomi complessi.</strong>
 </p>
 

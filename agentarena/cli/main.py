@@ -61,6 +61,12 @@ def main():
     cost_parser.add_argument("--version", required=True, help="Agent version")
     cost_parser.add_argument("--model", default="gpt-4o-mini", help="Target model pricing (e.g. gpt-4o, claude-3-5-sonnet, gemini-1.5-flash)")
 
+    # badge generation command
+    badge_parser = subparsers.add_parser("badge", help="Generate SVG badge for README / CI")
+    badge_parser.add_argument("--version", required=True, help="Agent version")
+    badge_parser.add_argument("--metric", choices=["success", "elo"], default="success")
+    badge_parser.add_argument("--out", default="agentarena_badge.svg", help="Output SVG path")
+
     args = parser.parse_args()
 
     storage = RunStorage()
@@ -257,6 +263,28 @@ def main():
             cost_per_1k = (cost / max(1, len(runs))) * 1000
             print(f"{m:<25}${cost:<19.5f}${cost_per_1k:.3f}")
         print("=" * 65 + "\n")
+
+    elif args.command == "badge":
+        from agentarena.badging.generator import SvgBadgeGenerator
+        if args.metric == "success":
+            s = storage.get_version_summary(args.version)
+            val = f"{s['success_rate']}%"
+            badge_svg = SvgBadgeGenerator.generate_badge_svg("AgentArena Pass", val, status="success" if s['success_rate'] >= 80 else "warning")
+        else:
+            from agentarena.leaderboard.elo import EloRatingSystem
+            versions = storage.list_versions()
+            version_runs = {v: storage.load_runs_for_version(v) for v in versions}
+            board = EloRatingSystem.compute_leaderboard(version_runs)
+            elo_val = "1200"
+            for row in board:
+                if row["version"] == args.version:
+                    elo_val = str(row["elo_rating"])
+                    break
+            badge_svg = SvgBadgeGenerator.generate_badge_svg("AgentArena Elo", elo_val, status="primary")
+
+        with open(args.out, "w", encoding="utf-8") as f:
+            f.write(badge_svg)
+        print(f"✅ Badge SVG salvato con successo in {args.out}")
     else:
         parser.print_help()
 
