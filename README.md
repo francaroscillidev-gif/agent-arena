@@ -51,19 +51,31 @@ python3 -m agentarena.cli.main otel --version v2.0.0-optimized --out traces.json
 python3 -m agentarena.cli.main gate --baseline v1.0.0-baseline --candidate v2.0.0-optimized --max-success-drop 0.0 --max-token-increase 20.0
 ```
 
-### 7. Generatore di Benchmark Sintetici
+### 6. Global Multi-Agent Elo Leaderboard
+Classifica Elo globale a gironi (round-robin) basata su scontri diretti task-per-task:
+```bash
+python3 -m agentarena.cli.main leaderboard
+```
+
+### 7. Statistical Significance & Bootstrap 95% Confidence Intervals
+Verifica con p-value non-parametrico e intervalli empirici se il miglioramento della nuova versione è statisticamente solido:
+```bash
+python3 -m agentarena.cli.main stats --a v1.0.0-baseline --b v2.0.0-optimized
+```
+
+### 8. Generatore di Benchmark Sintetici
 Genera al volo dataset di benchmark complessi per specifici domini (ecommerce, devops, finanza):
 ```bash
 python3 -m agentarena.cli.main synth --domain devops --count 5 --out datasets/synth_devops.json
 ```
 
-### 8. Chaos Engineering & Fault Resilience Testing
+### 9. Chaos Engineering & Fault Resilience Testing
 Simula fallimenti intermittenti dei tool, latenze di rete e payload malformati per valutare la capacità di auto-riparazione (Self-Healing) dell'agente:
 ```bash
 python3 -m agentarena.cli.main benchmark --agent both --chaos
 ```
 
-### 9. Avviare la Dashboard Web Side-by-Side
+### 10. Avviare la Dashboard Web Side-by-Side
 ```bash
 python3 -m agentarena.cli.main ui --port 8080
 ```

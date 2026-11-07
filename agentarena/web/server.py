@@ -48,6 +48,25 @@ class AgentArenaHTTPHandler(http.server.SimpleHTTPRequestHandler):
             self._send_json(summary)
             return
 
+        elif path == "/api/leaderboard":
+            from agentarena.leaderboard.elo import EloRatingSystem
+            versions = STORAGE.list_versions()
+            version_runs = {v: STORAGE.load_runs_for_version(v) for v in versions}
+            board = EloRatingSystem.compute_leaderboard(version_runs)
+            self._send_json({"leaderboard": board})
+            return
+
+        elif path.startswith("/api/stats"):
+            from agentarena.stats.significance import StatisticalSignificanceAnalyzer
+            query = urllib.parse.parse_qs(parsed.query)
+            va = query.get("a", ["v1.0.0-baseline"])[0]
+            vb = query.get("b", ["v2.0.0-optimized"])[0]
+            runs_a = STORAGE.load_runs_for_version(va)
+            runs_b = STORAGE.load_runs_for_version(vb)
+            res = StatisticalSignificanceAnalyzer.compare_agent_versions(runs_a, runs_b)
+            self._send_json(res)
+            return
+
         elif path == "/api/tasks":
             tasks = [t.__dict__ for t in get_standard_tasks()]
             self._send_json({"tasks": tasks})

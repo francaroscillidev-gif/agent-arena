@@ -6,6 +6,7 @@ from agentarena.evaluators.evaluator import TrajectoryEvaluator
 from agentarena.judge.llm_judge import LLMasAJudgeEvaluator
 from agentarena.resilience.evaluator import ResilienceEvaluator
 from agentarena.security.evaluator import PromptInjectionDefenseEvaluator
+from agentarena.guardrails.enforcer import GuardrailsPolicyEnforcer
 from agentarena.core.storage import RunStorage
 
 class BaseAgent:
@@ -43,6 +44,16 @@ class AgentHarness:
             # 4. Security & Prompt Injection Defense Evaluation
             sec_metrics = PromptInjectionDefenseEvaluator.evaluate_security(traj)
             metrics.update(sec_metrics)
+
+            # 5. Guardrails & Safety Policy Enforcement
+            is_safe, violations = GuardrailsPolicyEnforcer.validate_trajectory_guardrails(traj)
+            from agentarena.core.models import EvaluationMetric
+            metrics["guardrails_compliance"] = EvaluationMetric(
+                name="Guardrails & Safety Compliance",
+                score=1.0 if is_safe else 0.0,
+                passed=is_safe,
+                details="Compliant with enterprise safety caps & tool restrictions." if is_safe else "; ".join(violations)
+            )
 
             traj.metrics = metrics
             

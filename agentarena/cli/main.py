@@ -47,6 +47,14 @@ def main():
     gate_parser.add_argument("--max-success-drop", type=float, default=0.0)
     gate_parser.add_argument("--max-token-increase", type=float, default=25.0)
 
+    # leaderboard command
+    subparsers.add_parser("leaderboard", help="Display global multi-agent Elo leaderboard")
+
+    # stats command
+    stats_parser = subparsers.add_parser("stats", help="Compute statistical significance & bootstrap 95% CIs")
+    stats_parser.add_argument("--a", required=True, help="Baseline agent version")
+    stats_parser.add_argument("--b", required=True, help="Candidate agent version")
+
     args = parser.parse_args()
 
     storage = RunStorage()
@@ -171,6 +179,44 @@ def main():
             sys.exit(1)
         else:
             sys.exit(0)
+
+    elif args.command == "leaderboard":
+        from agentarena.leaderboard.elo import EloRatingSystem
+        versions = storage.list_versions()
+        version_runs = {v: storage.load_runs_for_version(v) for v in versions}
+        board = EloRatingSystem.compute_leaderboard(version_runs)
+
+        print("\n" + "=" * 65)
+        print("🏆 AGENTARENA GLOBAL ELO LEADERBOARD")
+        print("=" * 65)
+        print(f"{'Rank':<6}{'Agent Version':<25}{'Elo Rating':<14}{'Record':<14}{'Win Rate':<10}")
+        print("-" * 65)
+        for idx, row in enumerate(board, 1):
+            print(f"#{idx:<5}{row['version']:<25}{row['elo_rating']:<14}{row['record']:<14}{row['win_rate']}%")
+        print("=" * 65 + "\n")
+
+    elif args.command == "stats":
+        from agentarena.stats.significance import StatisticalSignificanceAnalyzer
+        runs_a = storage.load_runs_for_version(args.a)
+        runs_b = storage.load_runs_for_version(args.b)
+        res = StatisticalSignificanceAnalyzer.compare_agent_versions(runs_a, runs_b)
+
+        print("\n" + "=" * 65)
+        print(f"📊 STATISTICAL SIGNIFICANCE & BOOTSTRAP 95% CI")
+        print(f"Baseline: {args.a} | Candidate: {args.b}")
+        print("=" * 65)
+        s = res["success_rate_comparison"]
+        print(f"• Success Rate Delta: {s['delta_pp']:+.1f}%")
+        print(f"  - Version A Mean: {s['version_a_mean']}% (95% CI: [{s['version_a_95_ci'][0]}%, {s['version_a_95_ci'][1]}%])")
+        print(f"  - Version B Mean: {s['version_b_mean']}% (95% CI: [{s['version_b_95_ci'][0]}%, {s['version_b_95_ci'][1]}%])")
+        print(f"  - p-value (Permutation test): {s['p_value']} ({'Significant p < 0.05' if s['statistically_significant'] else 'Not significant'})")
+
+        t = res["token_economy_comparison"]
+        print(f"\n• Token Economy Delta: {t['delta_tokens']:+.1f} tokens")
+        print(f"  - p-value: {t['p_value']}")
+
+        print(f"\n📢 Verdict: {res['overall_assessment']['verdict']}")
+        print("=" * 65 + "\n")
     else:
         parser.print_help()
 
