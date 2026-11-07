@@ -34,6 +34,7 @@ def main():
     diff_parser.add_argument("--a", required=True, help="Baseline version (e.g. v1.0.0-baseline)")
     diff_parser.add_argument("--b", required=True, help="Candidate version (e.g. v2.0.0-optimized)")
     diff_parser.add_argument("--out", default=None, help="Optional output file path (.md)")
+    diff_parser.add_argument("--html", default=None, help="Export as self-contained standalone HTML report (.html)")
 
     # otel export command
     otel_parser = subparsers.add_parser("otel", help="Export version trajectories to OpenTelemetry OTel format")
@@ -110,11 +111,19 @@ def main():
         from agentarena.evaluators.reporter import ReportExporter
         exporter = ReportExporter(storage)
         report = exporter.generate_markdown_diff(args.a, args.b)
+
+        if args.html:
+            from agentarena.reports.html_report import StandaloneHtmlReportGenerator
+            html_content = StandaloneHtmlReportGenerator.generate_html_report(storage, args.a, args.b)
+            with open(args.html, "w", encoding="utf-8") as f:
+                f.write(html_content)
+            print(f"✅ Report HTML standalone salvato in {args.html}")
+
         if args.out:
             with open(args.out, "w", encoding="utf-8") as f:
                 f.write(report)
             print(f"✅ Report salvato con successo in {args.out}")
-        else:
+        elif not args.html:
             print("\n" + report)
 
     elif args.command == "otel":

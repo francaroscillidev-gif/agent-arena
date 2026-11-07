@@ -42,9 +42,13 @@ python3 -m agentarena.cli.main benchmark --agent both
 python3 -m agentarena.cli.main summary
 ```
 
-### 3. Generare un Diff Report Markdown tra Versioni
+### 3. Generare un Diff Report Markdown o HTML Standalone tra Versioni
 ```bash
+# Markdown per PR / Terminale
 python3 -m agentarena.cli.main diff --a v1.0.0-baseline --b v2.0.0-optimized
+
+# HTML Interattivo Standalone (apribile offline, inviabile via mail o salvabile su S3/Blob)
+python3 -m agentarena.cli.main diff --a v1.0.0-baseline --b v2.0.0-optimized --html benchmark_report.html
 ```
 
 ### 4. Esportare Tracce in formato OpenTelemetry (OTel)
@@ -132,6 +136,29 @@ class MyCustomAgent(BaseAgent):
         # traj.steps.append(AgentStepRecord(...))
         traj.finish(success=True, final_output="Risultato")
         return traj
+```
+
+### 🤝 Integrazioni Dirette (LangChain & LlamaIndex)
+Se utilizzi già **LangChain** o **LlamaIndex**, puoi usare direttamente gli adapter built-in senza scrivere codice boilerplate:
+
+```python
+from agentarena.integrations.adapters import LangChainAgentArenaAdapter, LlamaIndexAgentArenaAdapter
+
+# Esempio LangChain (AgentExecutor o LangGraph Runnable)
+lc_adapter = LangChainAgentArenaAdapter(
+    agent_executor=my_langchain_agent,
+    name="CustomerSupportAgent",
+    version="v2.1.0-langchain",
+    prompt_version="prompt-cot-v3"
+)
+
+# Esempio LlamaIndex (FunctionCallingAgent / ReActAgent)
+llama_adapter = LlamaIndexAgentArenaAdapter(
+    agent_runner=my_llamaindex_runner,
+    name="FinancialAnalysisAgent",
+    version="v1.0.0-llama",
+    prompt_version="prompt-rag-v1"
+)
 ```
 
 ---
