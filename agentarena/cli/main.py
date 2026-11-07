@@ -56,6 +56,11 @@ def main():
     stats_parser.add_argument("--a", required=True, help="Baseline agent version")
     stats_parser.add_argument("--b", required=True, help="Candidate agent version")
 
+    # pricing / cost estimation command
+    cost_parser = subparsers.add_parser("cost", help="Calculate exact API costs for a benchmark run across models")
+    cost_parser.add_argument("--version", required=True, help="Agent version")
+    cost_parser.add_argument("--model", default="gpt-4o-mini", help="Target model pricing (e.g. gpt-4o, claude-3-5-sonnet, gemini-1.5-flash)")
+
     args = parser.parse_args()
 
     storage = RunStorage()
@@ -225,6 +230,32 @@ def main():
         print(f"  - p-value: {t['p_value']}")
 
         print(f"\n📢 Verdict: {res['overall_assessment']['verdict']}")
+        print("=" * 65 + "\n")
+
+    elif args.command == "cost":
+        from agentarena.cost.pricing import MultiModelCostEngine
+        runs = storage.load_runs_for_version(args.version)
+        if not runs:
+            print(f"Nessuna esecuzione trovata per {args.version}")
+            return
+        
+        tot_prompt = sum(r.get("prompt_tokens", 0) for r in runs)
+        tot_comp = sum(r.get("completion_tokens", 0) for r in runs)
+        total_tokens = tot_prompt + tot_comp
+
+        models_to_compare = [args.model, "gpt-4o", "gpt-4o-mini", "claude-3-5-sonnet", "gemini-1.5-flash"]
+        unique_models = list(dict.fromkeys(models_to_compare))
+
+        print("\n" + "=" * 65)
+        print(f"💰 AGENTARENA MULTI-MODEL COST ESTIMATOR: [{args.version}]")
+        print(f"Tokens: {tot_prompt} Prompt + {tot_comp} Completion = {total_tokens} Total")
+        print("=" * 65)
+        print(f"{'Model Provider':<25}{'Estimated Cost (USD)':<20}{'Cost per 1k Tasks':<20}")
+        print("-" * 65)
+        for m in unique_models:
+            cost = MultiModelCostEngine.calculate_cost(m, tot_prompt, tot_comp)
+            cost_per_1k = (cost / max(1, len(runs))) * 1000
+            print(f"{m:<25}${cost:<19.5f}${cost_per_1k:.3f}")
         print("=" * 65 + "\n")
     else:
         parser.print_help()

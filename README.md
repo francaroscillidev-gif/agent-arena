@@ -73,19 +73,25 @@ Verifica con p-value non-parametrico e intervalli empirici se il miglioramento d
 python3 -m agentarena.cli.main stats --a v1.0.0-baseline --b v2.0.0-optimized
 ```
 
-### 8. Generatore di Benchmark Sintetici
+### 8. Multi-Model Cost Estimation
+Calcola e confronta i costi esatti di esecuzione del benchmark sui principali provider LLM (OpenAI, Anthropic, Google Gemini, Llama):
+```bash
+python3 -m agentarena.cli.main cost --version v2.0.0-optimized
+```
+
+### 9. Generatore di Benchmark Sintetici
 Genera al volo dataset di benchmark complessi per specifici domini (ecommerce, devops, finanza):
 ```bash
 python3 -m agentarena.cli.main synth --domain devops --count 5 --out datasets/synth_devops.json
 ```
 
-### 9. Chaos Engineering & Fault Resilience Testing
+### 10. Chaos Engineering & Fault Resilience Testing
 Simula fallimenti intermittenti dei tool, latenze di rete e payload malformati per valutare la capacità di auto-riparazione (Self-Healing) dell'agente:
 ```bash
 python3 -m agentarena.cli.main benchmark --agent both --chaos
 ```
 
-### 10. Avviare la Dashboard Web Side-by-Side
+### 11. Avviare la Dashboard Web Side-by-Side
 ```bash
 python3 -m agentarena.cli.main ui --port 8080
 ```
