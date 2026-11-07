@@ -31,6 +31,25 @@ class AgentArenaHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(f.read())
             return
 
+        elif path.startswith("/assets/"):
+            filename = os.path.basename(path)
+            asset_path = os.path.join(STATIC_DIR, "assets", filename)
+            if os.path.exists(asset_path):
+                self.send_response(200)
+                if filename.endswith(".svg"):
+                    self.send_header("Content-Type", "image/svg+xml")
+                elif filename.endswith(".png"):
+                    self.send_header("Content-Type", "image/png")
+                else:
+                    self.send_header("Content-Type", "application/octet-stream")
+                self.end_headers()
+                with open(asset_path, "rb") as f:
+                    self.wfile.write(f.read())
+                return
+            else:
+                self.send_error(404, "Asset not found")
+                return
+
         elif path == "/api/versions":
             versions = STORAGE.list_versions()
             self._send_json({"versions": versions})

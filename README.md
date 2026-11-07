@@ -1,6 +1,12 @@
 # 🏟️ AgentArena: Agent Evaluation & Benchmarking Harness
 
-Un framework open-source leggero, modulare e standardizzato per testare, tracciare e confrontare le prestazioni di agenti autonomi complessi su compiti reali multi-step.
+<p align="center">
+  <img src="agentarena/web/assets/logo.svg" alt="AgentArena Logo" width="140" height="140" />
+</p>
+
+<p align="center">
+  <strong>Framework leggero, modulare e standardizzato per testare, tracciare e confrontare agenti autonomi complessi.</strong>
+</p>
 
 ---
 
